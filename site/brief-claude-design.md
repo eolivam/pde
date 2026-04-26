@@ -56,10 +56,11 @@ Contenido:
 - Nombre: Misa en Saint Mary of the Hills
 - Subtítulo sugerido: "En el SUM del colegio Saint Mary of the Hills"
 - Horario: Domingos 11:00 hs
-- Ubicación: Ruta 25 y Caamaño, Pilar del Este
-- Botón: "Cómo llegar" (link a Google Maps)
+- Ubicación: Ruta 25 y Caamaño, Panamericana Ramal Pilar km 46.5, Pilar del Este
+- Botón: "Cómo llegar" (link a Google Maps con coordenadas -34.485060, -58.588440)
 - Copy sugerido debajo: "La misa más cerca de casa. Vení a conocernos y ser parte de la comunidad."
-- Datos adicionales: placeholder para contacto, redes, etc. (se completarán después — marcar con "[Próximamente]")
+- Íconos de redes del colegio: IG (@stmaryofthehillsschool), FB, YouTube — con nota "Colegio Saint Mary"
+- Nota: los datos de contacto y redes corresponden al colegio; los de la misa/comunidad se completarán después
 
 ### 2d. Mapa de la zona
 
@@ -1087,23 +1088,29 @@ const MISA_DESTACADA = {
   nombre: "Misa en Saint Mary of the Hills",
   subtitulo: "En el SUM del colegio Saint Mary of the Hills",
   localidad: "Pilar del Este",
-  direccion: "Ruta 25 y Caamaño, Pilar del Este",
-  gps: null,
+  direccion: "Ruta 25 y Caamaño, Panamericana Ramal Pilar km 46.5, Pilar del Este",
+  gps: { lat: -34.485060, lng: -58.588440 },
   horario: "Domingos 11:00 hs",
   copySugerido: "La misa más cerca de casa. Vení a conocernos y ser parte de la comunidad.",
+  colegio: {
+    nombre: "Saint Mary of the Hills School — Sede Pilar",
+    fundacion: 2001,
+    orientacion: "Católico — catequesis centrada en Jesús y la Virgen María",
+    web: "https://www.stmary.edu.ar"
+  },
   contacto: {
-    tel: null,
+    tel: "0230-445-8181",
     wa: null,
-    email: null,
-    web: null
+    email: "stmary.sp@stmary.edu.ar",
+    web: "https://www.stmary.edu.ar"
   },
   redes: {
-    ig: null,
-    fb: null,
-    yt: null
+    ig: "stmaryofthehillsschool",
+    fb: "https://www.facebook.com/stmaryofthehillsschool",
+    yt: "https://www.youtube.com/channel/UCSZdctPCHV-UhK8kzmoYDiw"
   },
   datosCompletos: false,
-  nota: "Datos de contacto y redes próximamente"
+  nota: "Datos de la misa (contacto del celebrante, redes de la comunidad) próximamente. Los datos de contacto y redes corresponden al colegio."
 };
 ```
 
