@@ -25,9 +25,6 @@
       --color-border: #E8E4E0;
       --color-text: #1A1614;
       --color-text-secondary: #6B6460;
-      --color-zona-primaria: #5C3D8F;
-      --color-zona-secundaria: #2563EB;
-      --color-zona-extendida: #059669;
       --color-destacado: #B5862A;
       --color-whatsapp: #25D366;
       --color-instagram: #E1306C;
@@ -46,9 +43,6 @@
       --color-border: #2E2A27;
       --color-text: #F2EFE9;
       --color-text-secondary: #9C9490;
-      --color-zona-primaria: #9B72CF;
-      --color-zona-secundaria: #60A5FA;
-      --color-zona-extendida: #34D399;
       --color-destacado: #D4A03A;
     }
 
@@ -318,19 +312,6 @@
       box-shadow: var(--shadow-card);
     }
     .list-panel { overflow: hidden; }
-    .zone-heading {
-      margin: 0;
-      padding: 10px 16px;
-      border-top: 1px solid var(--color-border);
-      background: color-mix(in srgb, var(--zone-color) 8%, var(--color-surface));
-      color: var(--zone-color);
-      font-family: Inter, sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-    .zone-heading:first-child { border-top: 0; }
     .church-item {
       width: 100%;
       padding: 12px 16px;
@@ -515,15 +496,11 @@
         <div id="leaflet-map" style="width:100%;height:100%"></div>
       </div>
       <div class="legend" aria-label="Leyenda del mapa">
-        <span style="color:var(--color-zona-primaria)"><i class="dot"></i> Zona Primaria</span>
-        <span style="color:var(--color-zona-secundaria)"><i class="dot"></i> Zona Secundaria</span>
-        <span style="color:var(--color-zona-extendida)"><i class="dot"></i> Zona Extendida</span>
         <span style="color:var(--color-destacado)"><i class="dot"></i> Misa de la comunidad</span>
       </div>
     </section>
 
     <section aria-label="Directorio de iglesias">
-      <div class="filters" id="filters" aria-label="Filtrar por zona"></div>
       <div class="directory">
         <div class="list-panel" id="churchList" role="listbox" aria-label="Iglesias"></div>
         <article class="detail-panel" id="detailPanel" tabindex="-1" aria-live="polite"></article>
@@ -625,6 +602,34 @@ const IGLESIAS = [
       fb: "https://www.facebook.com/parroquiasanmanuel",
       yt: null
     },
+    datosCompletos: false
+  },
+  {
+    id: "noviciado-santa-teresita",
+    nombre: "Noviciado Santa Teresita — Hnas. de la Fraternidad San Pío X",
+    nombreCorto: "Noviciado Santa Teresita",
+    tipo: "noviciado",
+    localidad: "La Lonja",
+    zona: "primaria",
+    direccion: "El Palenque 2060, La Lonja",
+    gps: null,
+    misas: [
+      { dia: "Lunes a Viernes", horarios: ["7:15"] },
+      { dia: "Domingo", horarios: ["10:00"] }
+    ],
+    sacramentos: {
+      confesion: null,
+      bautismo: null,
+      primeracomunion: null,
+      confirmacion: null,
+      matrimonio: null
+    },
+    actividades: [
+      "Liturgia Tridentina (Misa en Latín)",
+      "Casa de formación de religiosas de la FSSPX"
+    ],
+    contacto: { tel: null, wa: null, email: null, web: null },
+    redes: { ig: null, fb: null, yt: null },
     datosCompletos: false
   },
   {
@@ -1237,14 +1242,7 @@ const MISA_DESTACADA = {
   cachoWa: "+5491154191414"
 };
 
-const ZONAS = {
-  primaria: { label: 'Zona Primaria', color: 'var(--color-zona-primaria)' },
-  secundaria: { label: 'Zona Secundaria', color: 'var(--color-zona-secundaria)' },
-  extendida: { label: 'Zona Extendida', color: 'var(--color-zona-extendida)' }
-};
-const ZONA_ORDER = ['primaria', 'secundaria', 'extendida'];
 const WA_GROUP = 'https://chat.whatsapp.com/LPnnK5KIRbq4RWM6muCFbS';
-let activeZone = 'todas';
 let selectedId = 'santuario-cielo';
 
 function icon(name, size = 'small') {
@@ -1269,8 +1267,6 @@ function icon(name, size = 'small') {
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 }
-function zoneColor(zona) { return ZONAS[zona]?.color || 'var(--color-primary)'; }
-function zoneLabel(zona) { return ZONAS[zona]?.label || 'Todas'; }
 function mapsUrl(gps) { return gps ? 'https://maps.google.com/?q=' + gps.lat + ',' + gps.lng : ''; }
 function igUrl(handle) { return handle ? 'https://www.instagram.com/' + handle.replace(/^@/, '') : ''; }
 function ytUrl(value) { return value?.startsWith('http') ? value : 'https://www.youtube.com/@' + value; }
@@ -1300,11 +1296,6 @@ function renderFeaturedMass() {
     '</p>';
 }
 
-function renderFilters() {
-  const filters = [{ key: 'todas', label: 'Todas', color: 'var(--color-primary)' }, ...ZONA_ORDER.map(key => ({ key, label: ZONAS[key].label, color: ZONAS[key].color }))];
-  document.getElementById('filters').innerHTML = filters.map(filter => '<button class="pill" style="--pill-color:'+filter.color+'" type="button" aria-pressed="'+(activeZone === filter.key)+'" onclick="filterByZona(&quot;'+filter.key+'&quot;)">'+filter.label+'</button>').join('');
-}
-
 function churchSocials(church) {
   const web = church.contacto?.web || null;
   const wa = church.contacto?.wa ? '<a class="icon-link" data-kind="wa" title="WhatsApp" aria-label="WhatsApp" href="'+waUrl(church.contacto.wa)+'" target="_blank" rel="noopener">'+icon('wa')+'</a>' : '';
@@ -1313,16 +1304,10 @@ function churchSocials(church) {
 
 function renderList() {
   const list = document.getElementById('churchList');
-  const zones = activeZone === 'todas' ? ZONA_ORDER : [activeZone];
-  list.innerHTML = zones.map(zona => {
-    const churches = IGLESIAS.filter(church => church.zona === zona);
-    if (!churches.length) return '';
-    const heading = activeZone === 'todas' ? '<h3 class="zone-heading" style="--zone-color:'+zoneColor(zona)+'">'+zoneLabel(zona)+'</h3>' : '';
-    return heading + churches.map(church => '<button class="church-item" role="option" tabindex="0" aria-selected="'+(church.id === selectedId)+'" style="--item-color:'+zoneColor(church.zona)+'" onclick="selectChurch(&quot;'+church.id+'&quot;)" onkeydown="handleItemKey(event, &quot;'+church.id+'&quot;)">'+
-      '<div class="item-top"><span class="item-name">'+escapeHtml(church.nombreCorto || church.nombre)+'</span><span class="item-icons">'+churchSocials(church)+'</span></div>'+
-      '<div class="item-bottom"><span class="item-meta">'+escapeHtml(church.tipo)+' · '+escapeHtml(church.localidad)+'</span><span class="badge" style="--badge-color:'+zoneColor(church.zona)+'">'+zoneLabel(church.zona).replace('Zona ', '')+'</span></div>'+
-      '</button>').join('');
-  }).join('');
+  list.innerHTML = IGLESIAS.map(church => '<button class="church-item" role="option" tabindex="0" aria-selected="'+(church.id === selectedId)+'" style="--item-color:var(--color-primary)" onclick="selectChurch(&quot;'+church.id+'&quot;)" onkeydown="handleItemKey(event, &quot;'+church.id+'&quot;)">'+
+    '<div class="item-top"><span class="item-name">'+escapeHtml(church.nombre)+'</span><span class="item-icons">'+churchSocials(church)+'</span></div>'+
+    '<div class="item-bottom"><span class="item-meta">'+escapeHtml(church.tipo)+' · '+escapeHtml(church.localidad)+'</span></div>'+
+    '</button>').join('');
 }
 
 function renderDetail(id) {
@@ -1337,7 +1322,7 @@ function renderDetail(id) {
     const activities = church.actividades?.length ? '<ul class="activity-list">'+church.actividades.map(item => '<li>'+escapeHtml(item)+'</li>').join('')+'</ul>' : '<p class="empty">Sin actividades registradas por ahora.</p>';
     const contact = renderContact(church.contacto);
     const redes = socialLinks(church.redes, 'large');
-    panel.innerHTML = '<div class="detail-head"><div><h2>'+escapeHtml(church.nombre)+'</h2><p>'+escapeHtml(church.tipo)+' · '+escapeHtml(church.localidad)+'</p></div><span class="badge" style="--badge-color:'+zoneColor(church.zona)+'">'+zoneLabel(church.zona)+'</span></div>'+
+    panel.innerHTML = '<div class="detail-head"><div><h2>'+escapeHtml(church.nombre)+'</h2><p>'+escapeHtml(church.tipo)+' · '+escapeHtml(church.localidad)+'</p></div></div>'+
       '<p class="inline-row address">'+icon('pin')+'<span>'+escapeHtml(church.direccion)+' '+mapLine+'</span></p>'+
       '<section class="section"><h3>'+icon('cross')+'Horarios de Misa</h3>'+masses+'</section>'+
       '<section class="section"><h3>Sacramentos</h3>'+sacramentos+'</section>'+
@@ -1373,20 +1358,21 @@ function selectChurch(id) {
   selectedId = id;
   renderList();
   renderDetail(id);
+  if (window.innerWidth <= 760) requestAnimationFrame(() => scrollToDetail());
 
   if (leafletMap) {
     // Deseleccionar marker anterior
     if (prevId && markersMap[prevId]) {
       const prev = IGLESIAS.find(c => c.id === prevId);
       if (prev?.gps) {
-        markersMap[prevId].setIcon(createMarkerIcon(prev.zona, false));
+        markersMap[prevId].setIcon(createMarkerIcon(false));
         markersMap[prevId].setZIndexOffset(0);
       }
     }
     // Seleccionar marker nuevo
     const church = IGLESIAS.find(c => c.id === id);
     if (church?.gps && markersMap[id]) {
-      markersMap[id].setIcon(createMarkerIcon(church.zona, true));
+      markersMap[id].setIcon(createMarkerIcon(true));
       markersMap[id].setZIndexOffset(1000);
       leafletMap.panTo([church.gps.lat, church.gps.lng], { animate: true, duration: 0.5 });
       leafletMap.closePopup();
@@ -1397,25 +1383,6 @@ function selectChurch(id) {
 }
 function scrollToDetail() {
   document.getElementById('detailPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-function filterByZona(zona) {
-  activeZone = zona;
-  const first = zona === 'todas' ? IGLESIAS.find(church => church.zona === 'primaria') : IGLESIAS.find(church => church.zona === zona);
-  selectedId = first?.id || IGLESIAS[0].id;
-  renderFilters();
-  renderList();
-  renderDetail(selectedId);
-
-  if (leafletMap) {
-    if (zona === 'todas') {
-      fitMapToIglesias();
-    } else {
-      const pts = IGLESIAS.filter(c => c.zona === zona && c.gps).map(c => [c.gps.lat, c.gps.lng]);
-      if (pts.length > 0) leafletMap.fitBounds(L.latLngBounds(pts), { padding: [40, 40], maxZoom: 14 });
-    }
-    // Highlight marker de la primera iglesia de la zona
-    updateSelectedMarker();
-  }
 }
 function handleItemKey(event, id) {
   if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectChurch(id); }
@@ -1468,19 +1435,12 @@ const TILE_PROVIDERS = {
   }
 };
 
-function getZoneHex(zona, isDark) {
-  const map = {
-    primaria:   isDark ? '#9B72CF' : '#5C3D8F',
-    secundaria: isDark ? '#60A5FA' : '#2563EB',
-    extendida:  isDark ? '#34D399' : '#059669'
-  };
-  return map[zona] || (isDark ? '#9B72CF' : '#5C3D8F');
-}
+function getPrimaryHex(isDark) { return isDark ? '#9B72CF' : '#5C3D8F'; }
 function getDestacadoHex(isDark) { return isDark ? '#D4A03A' : '#B5862A'; }
 
-function createMarkerIcon(zona, isSelected, isDestacado) {
+function createMarkerIcon(isSelected, isDestacado) {
   const isDark = document.documentElement.classList.contains('dark');
-  const color = isDestacado ? getDestacadoHex(isDark) : getZoneHex(zona, isDark);
+  const color = isDestacado ? getDestacadoHex(isDark) : getPrimaryHex(isDark);
   const size = isDestacado ? 36 : (isSelected ? 30 : 24);
 
   let html;
@@ -1503,15 +1463,13 @@ function createMarkerIcon(zona, isSelected, isDestacado) {
 
 function createPopupContent(church) {
   const isDark = document.documentElement.classList.contains('dark');
-  const dotColor = getZoneHex(church.zona, isDark);
+  const color = getPrimaryHex(isDark);
   return '<div style="min-width:160px;max-width:240px">' +
-    '<strong style="font-size:14px;display:block;margin-bottom:4px">' + escapeHtml(church.nombreCorto || church.nombre) + '</strong>' +
-    '<span style="font-size:12px;color:var(--color-text-secondary)">' +
-    '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + dotColor + ';margin-right:6px;vertical-align:middle"></span>' +
-    escapeHtml(church.localidad) + '</span>' +
+    '<strong style="font-size:14px;display:block;margin-bottom:4px">' + escapeHtml(church.nombre) + '</strong>' +
+    '<span style="font-size:12px;color:var(--color-text-secondary)">' + escapeHtml(church.localidad) + '</span>' +
     '<button onclick="selectChurch(\'' + church.id + '\');scrollToDetail()" ' +
     'style="display:block;width:100%;margin-top:8px;padding:6px;border:none;border-radius:6px;' +
-    'background:' + dotColor + ';color:#fff;font-size:13px;font-weight:600;cursor:pointer">' +
+    'background:' + color + ';color:#fff;font-size:13px;font-weight:600;cursor:pointer">' +
     'Ver detalles</button></div>';
 }
 
@@ -1556,11 +1514,11 @@ function updateMapTiles() {
 function refreshMarkerIcons() {
   IGLESIAS.forEach(function(church) {
     if (church.gps && markersMap[church.id]) {
-      markersMap[church.id].setIcon(createMarkerIcon(church.zona, church.id === selectedId));
+      markersMap[church.id].setIcon(createMarkerIcon(church.id === selectedId));
     }
   });
   if (MISA_DESTACADA.gps && markersMap['saint-mary-hills']) {
-    markersMap['saint-mary-hills'].setIcon(createMarkerIcon(null, false, true));
+    markersMap['saint-mary-hills'].setIcon(createMarkerIcon(false, true));
   }
 }
 
@@ -1568,7 +1526,7 @@ function updateSelectedMarker() {
   IGLESIAS.forEach(function(church) {
     if (church.gps && markersMap[church.id]) {
       const isSel = church.id === selectedId;
-      markersMap[church.id].setIcon(createMarkerIcon(church.zona, isSel));
+      markersMap[church.id].setIcon(createMarkerIcon(isSel));
       markersMap[church.id].setZIndexOffset(isSel ? 1000 : 0);
     }
   });
@@ -1583,8 +1541,8 @@ function renderMarkers() {
     if (!church.gps) return;
     var isSel = church.id === selectedId;
     var marker = L.marker([church.gps.lat, church.gps.lng], {
-      icon: createMarkerIcon(church.zona, isSel),
-      title: church.nombreCorto || church.nombre,
+      icon: createMarkerIcon(isSel),
+      title: church.nombre,
       alt: church.nombre,
       zIndexOffset: isSel ? 1000 : 0
     });
@@ -1598,7 +1556,7 @@ function renderMarkers() {
   var m = MISA_DESTACADA;
   if (m.gps) {
     var dm = L.marker([m.gps.lat, m.gps.lng], {
-      icon: createMarkerIcon(null, false, true),
+      icon: createMarkerIcon(false, true),
       title: m.nombre,
       zIndexOffset: 2000
     });
@@ -1643,7 +1601,6 @@ initTheme();
 hydrateStaticIcons();
 applyHelloState();
 renderFeaturedMass();
-renderFilters();
 renderList();
 renderDetail(selectedId);
 window.addEventListener('load', initMap);

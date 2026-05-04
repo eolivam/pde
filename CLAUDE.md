@@ -18,8 +18,9 @@ pde/
 | Tarea | Ir a | Leer |
 |-------|------|------|
 | Investigar/relevar iglesias | research/ | CONTEXT.md, referencia-zona.md |
-| Publicar landing o sitio | site/ | CONTEXT.md |
+| Editar o deployar el sitio | site/ | CONTEXT.md |
 | Organizar acciones comunitarias | comunidad/ | CONTEXT.md |
+| Transcripcion automatica del evangelio | comunidad/wa-transcriber/ | CONTEXT.md |
 
 ## Naming
 
