@@ -1358,7 +1358,7 @@ function selectChurch(id) {
   selectedId = id;
   renderList();
   renderDetail(id);
-  if (window.innerWidth <= 760) requestAnimationFrame(() => scrollToDetail());
+  if (window.innerWidth <= 760) setTimeout(() => scrollToDetail(), 150);
 
   if (leafletMap) {
     // Deseleccionar marker anterior
