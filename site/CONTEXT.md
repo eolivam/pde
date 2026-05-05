@@ -21,8 +21,8 @@ Sitio web público de la comunidad católica de Pilar del Este. Un solo archivo 
 | Trigger | Auto-deploy al pushear a `main` |
 | Config Vercel | `site/.vercel/project.json` (en `.gitignore`, no visible en git) |
 
-**Para deployar:** hacer push a `main`. Vercel detecta el cambio y despliega solo.
-No hay comando de build ni CLI necesario — el HTML es estático.
+**Para deployar:** correr `vercel --prod` desde la carpeta `site/`. El deploy NO es automático por push a GitHub — Vercel está conectado por CLI, no por integración GitHub.
+No hay comando de build — el HTML es estático.
 
 ## Estructura
 
