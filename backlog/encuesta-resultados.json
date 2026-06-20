@@ -1,0 +1,13 @@
+{
+  "deploy_ok": true,
+  "url": "https://pde.kolbelabs.com/encuesta",
+  "http_status": 200,
+  "slides": 12,
+  "slides_con_overflow": 0,
+  "viewports_validados": ["1920x1080", "1600x900", "1536x864", "1440x900", "1366x768", "1280x800", "1280x720"],
+  "temas": ["claro", "oscuro"],
+  "respuestas": 26,
+  "barrios": 11,
+  "mojibake": false,
+  "verificado": "2026-06-20"
+}
