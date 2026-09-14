@@ -5,7 +5,7 @@ workspace: pde
 prueba:
   tipo: manual
   estado: pending
-last_verified: 2026-06-01
+last_verified: 2026-06-29
 ttl_dias: 14
 ---
 
