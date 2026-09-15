@@ -34,3 +34,5 @@ pde/
 - Diocesis: Zarate-Campana (NO Buenos Aires, NO San Isidro)
 - NO confundir con Basilica del Pilar de Recoleta (CABA)
 - Datos con fuente inline y nivel de confianza (`[verificado]` / `[fuente secundaria]` / `[PENDIENTE]`)
+
+@CONTEXT.md
